@@ -464,6 +464,34 @@ public class HomeFurniturePanel extends JPanel implements DialogView {
           }
         });
     }
+
+    if (controller.isPropertyEditable(HomeFurnitureController.Property.HEIGHT)) {
+      // Create height label and its spinner bound to HEIGHT controller property
+      this.heightLabel = new JLabel(SwingTools.getLocalizedLabelText(preferences, HomeFurniturePanel.class,
+              "heightLabel.text", unitName));
+      final NullableSpinner.NullableSpinnerLengthModel heightSpinnerModel = new NullableSpinner.NullableSpinnerLengthModel(
+              preferences, minimumLength, maximumLength);
+      this.heightSpinner = new NullableSpinner(heightSpinnerModel);
+      final PropertyChangeListener heightChangeListener = new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent ev) {
+          Float height = controller.getHeight();
+          heightSpinnerModel.setNullable(height == null);
+          heightSpinnerModel.setLength(height);
+          if (height != null) {
+            heightSpinnerModel.setMinimumLength(Math.min(height, minimumLength));
+          }
+        }
+      };
+      heightChangeListener.propertyChange(null);
+      controller.addPropertyChangeListener(HomeFurnitureController.Property.HEIGHT, heightChangeListener);
+      heightSpinnerModel.addChangeListener(new ChangeListener() {
+        public void stateChanged(ChangeEvent ev) {
+          controller.removePropertyChangeListener(HomeFurnitureController.Property.HEIGHT, heightChangeListener);
+          controller.setHeight(heightSpinnerModel.getLength());
+          controller.addPropertyChangeListener(HomeFurnitureController.Property.HEIGHT, heightChangeListener);
+        }
+      });
+    }
     
     if (controller.isPropertyEditable(HomeFurnitureController.Property.PROPORTIONAL)) {
       // Create keep proportions check box bound to PROPORTIONAL controller property

@@ -953,6 +953,14 @@ public class HomeFurnitureController implements Controller {
   public Float getHeight() {
     return this.height;
   }
+
+  public Float getVolume(){
+    if (this.width == null || this.height == null || this.depth == null){
+      return null;
+    }else{
+      return this.width * this.height * this.depth;
+    }
+  }
   
   /**
    * Sets whether furniture proportions should be kept.
@@ -1186,7 +1194,7 @@ public class HomeFurnitureController implements Controller {
       Boolean visible = getVisible();
       Boolean modelMirrored = getModelMirrored();
       Float lightPower = getLightPower();
-      
+
       // Create an array of modified furniture with their current properties values
       ModifiedPieceOfFurniture [] modifiedFurniture = 
           new ModifiedPieceOfFurniture [selectedFurniture.size()]; 
@@ -1267,7 +1275,8 @@ public class HomeFurnitureController implements Controller {
                                               boolean defaultShininess, Float shininess,
                                               Boolean visible,
                                               Boolean modelMirrored,
-                                              Float lightPower) {
+                                              Float lightPower
+                                              ) {
       this.home = home;
       this.preferences = preferences;
       this.oldSelection = oldSelection;
@@ -1311,7 +1320,7 @@ public class HomeFurnitureController implements Controller {
           this.angle, this.basePlanItem, this.width, this.depth, this.height, 
           this.paint, this.color, this.texture, this.modelMaterials, 
           this.defaultShininess, this.shininess,
-          this.visible, this.modelMirrored, this.lightPower); 
+          this.visible, this.modelMirrored, this.lightPower);
       this.home.setSelectedItems(this.newSelection); 
     }
 

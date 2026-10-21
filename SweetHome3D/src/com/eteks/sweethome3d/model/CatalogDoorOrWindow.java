@@ -61,6 +61,7 @@ public class CatalogDoorOrWindow extends CatalogPieceOfFurniture implements Door
                              boolean resizable, BigDecimal price, BigDecimal valueAddedTaxPercentage) {
     this(id, name, description, icon, null, model, width, depth, height, elevation, movable,   
         wallThickness, wallDistance, sashes, modelRotation, creator, resizable, price, valueAddedTaxPercentage);
+
   }
          
   /**
@@ -85,7 +86,7 @@ public class CatalogDoorOrWindow extends CatalogPieceOfFurniture implements Door
    * @param price the price of the new door or window, or <code>null</code> 
    * @param valueAddedTaxPercentage the Value Added Tax percentage applied to the 
    *             price of the new door or window or <code>null</code>
-   * @since 2.2 
+   * @since 2.2
    */
   public CatalogDoorOrWindow(String id, String name, String description, 
                              Content icon, Content planIcon, Content model, 

@@ -65,6 +65,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
   private final BigDecimal        price;
   private final BigDecimal        valueAddedTaxPercentage;
   private final String            currency;
+  private  float                  volume;
 
   private FurnitureCategory       category;
   private byte []                 filterCollationKey;
@@ -97,6 +98,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
                                  boolean movable, boolean doorOrWindow) {
     this(null, name, null, icon, model, width, depth, height, 0, movable, doorOrWindow, 
         INDENTITY_ROTATION, null, true, null, null);
+    this.volume = width*height*depth;
   }
 
   /**
@@ -129,6 +131,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
                                  boolean resizable, BigDecimal price, BigDecimal valueAddedTaxPercentage) {
     this(id, name, description, icon, model, width, depth, height, elevation, movable, 
         modelRotation, creator, resizable, price, valueAddedTaxPercentage);
+    this.volume = width*height*depth;
   }
          
   /**
@@ -157,6 +160,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
                                  boolean resizable, BigDecimal price, BigDecimal valueAddedTaxPercentage) {
     this(id, name, description, icon, null, model, width, depth, height, elevation, movable, 
         modelRotation, creator, resizable, price, valueAddedTaxPercentage);
+    this.volume = width*height*depth;
   }
          
   /**
@@ -187,6 +191,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
                                  boolean resizable, BigDecimal price, BigDecimal valueAddedTaxPercentage) {
     this(id, name, description, icon, planIcon, model, width, depth, height, elevation, movable, 
         modelRotation, creator, resizable, true, true, price, valueAddedTaxPercentage);
+    this.volume = width*height*depth;
   }
   
   /**
@@ -222,6 +227,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
     this(id, name, description, icon, planIcon, model, width, depth, height, elevation, 
         movable, null, modelRotation, creator, resizable, deformable, texturable,
         price, valueAddedTaxPercentage, null);
+    this.volume =  width*height*depth;
   }
   
   /**
@@ -261,6 +267,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
     this(id, name, description, null, new String [0], null, null, icon, planIcon, model, width, depth, 
         height, elevation, movable, staircaseCutOutShape, modelRotation, creator, resizable, deformable,
         texturable, price, valueAddedTaxPercentage, currency);
+    this.volume=width*height*depth;
   }
   
   /**
@@ -305,6 +312,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
     this(id, name, description, information, tags, creationDate, grade, icon, planIcon, model, width, depth, 
         height, elevation, 1f, movable, false, staircaseCutOutShape, null, modelRotation, false, creator, resizable, deformable,
         texturable, price, valueAddedTaxPercentage, currency, (float)Math.PI / 8, true, false);
+    volume=width*height*depth;
   }
   
   /**
@@ -352,6 +360,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
     this(id, name, description, information, tags, creationDate, grade, icon, planIcon, model, width, depth, height, 
         elevation, dropOnTopElevation, movable, staircaseCutOutShape, modelRotation, false, 
         creator, resizable, deformable, texturable, price, valueAddedTaxPercentage, currency);
+    this.volume=width*height*depth;
   }
   
   /**
@@ -400,6 +409,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
     this(id, name, description, information, tags, creationDate, grade, icon, planIcon, model, width, depth, 
         height, elevation, dropOnTopElevation, movable, false, staircaseCutOutShape, null, modelRotation, backFaceShown, 
         creator, resizable, deformable, texturable, price, valueAddedTaxPercentage, currency, (float)Math.PI / 8, true, false);
+    this.volume=width*height*depth;
   }
   
   /**
@@ -429,6 +439,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
                                  float iconYaw, boolean proportional) {
     this(name, icon, model, width, depth, height, elevation, movable, 
         color, modelRotation, backFaceShown, iconYaw, proportional);
+    this.volume=width*height*depth;
   }
   
   /**
@@ -455,6 +466,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
                                  float iconYaw, boolean proportional) {
     this(name, icon, model, width, depth, height, elevation, movable,  
         null, color, modelRotation, backFaceShown, iconYaw, proportional);
+    this.volume=width*height*depth;
   }
   
   /**
@@ -483,6 +495,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
                                  boolean backFaceShown, float iconYaw, boolean proportional) {
     this(null, name, null, null, new String [0], System.currentTimeMillis(), null, icon, null, model, width, depth, height, elevation, 1f,
         movable, false, staircaseCutOutShape, color, modelRotation, backFaceShown, null, true, true, true, null, null, null, iconYaw, proportional, true);
+    this.volume=width*height*depth;
   }
   
   private CatalogPieceOfFurniture(String id, String name, String description, 
@@ -530,6 +543,7 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
     this.iconYaw = iconYaw;
     this.proportional = proportional;
     this.modifiable = modifiable;
+    this.volume = width*height*depth;
   }
 
   /**
@@ -671,6 +685,13 @@ public class CatalogPieceOfFurniture implements Comparable<CatalogPieceOfFurnitu
   public float [][] getModelRotation() {
     // Return a deep copy to avoid any misuse of piece data
     return deepCopy(this.modelRotation);
+  }
+
+  /**
+   * Returns the rectangular prismic volume of this piece of furniture.
+   */
+  public float getVolume(){
+    return this.volume;
   }
 
   private float [][] deepCopy(float [][] modelRotation) {
