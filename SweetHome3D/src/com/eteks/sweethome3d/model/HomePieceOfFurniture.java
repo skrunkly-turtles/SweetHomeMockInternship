@@ -58,7 +58,7 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
    */
   public enum SortableProperty {CATALOG_ID, NAME, WIDTH, DEPTH, HEIGHT, MOVABLE, 
                                 DOOR_OR_WINDOW, COLOR, TEXTURE, VISIBLE, X, Y, ELEVATION, ANGLE,
-                                PRICE, VALUE_ADDED_TAX, VALUE_ADDED_TAX_PERCENTAGE, PRICE_VALUE_ADDED_TAX_INCLUDED, LEVEL};
+                                PRICE, VALUE_ADDED_TAX, VALUE_ADDED_TAX_PERCENTAGE, PRICE_VALUE_ADDED_TAX_INCLUDED, LEVEL, VOLUME};
   private static final Map<SortableProperty, Comparator<HomePieceOfFurniture>> SORTABLE_PROPERTY_COMPARATORS;
   private static final float [][] IDENTITY = new float [][] {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
   
@@ -107,6 +107,11 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
           return HomePieceOfFurniture.compare(piece1.depth, piece2.depth);
         }
       });
+    SORTABLE_PROPERTY_COMPARATORS.put(SortableProperty.VOLUME, new Comparator<HomePieceOfFurniture>() {
+      public int compare(HomePieceOfFurniture piece1, HomePieceOfFurniture piece2) {
+        return HomePieceOfFurniture.compare(piece1.volume, piece2.volume);
+      }
+    });
     SORTABLE_PROPERTY_COMPARATORS.put(SortableProperty.MOVABLE, new Comparator<HomePieceOfFurniture>() {
         public int compare(HomePieceOfFurniture piece1, HomePieceOfFurniture piece2) {
           return HomePieceOfFurniture.compare(piece1.movable, piece2.movable);
@@ -268,6 +273,7 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
   private float                  angle;
   private boolean                modelMirrored;
   private Level                  level;
+  private float                  volume;
   
   private transient PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
   private transient Shape shapeCache;
@@ -325,6 +331,7 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
       this.visible = true;
       this.x = this.width / 2;
       this.y = this.depth / 2;
+      this.volume = this.height*this.width*this.depth;
     }
   }
 
@@ -586,6 +593,13 @@ public class HomePieceOfFurniture extends HomeObject implements PieceOfFurniture
     } else {
       throw new IllegalStateException("Piece isn't resizable");
     }
+  }
+
+  /**
+   * Returns the volume of the furniture by width*depth*height
+   */
+  public float getVolume(){
+    return getWidth()*getHeight()*getDepth();
   }
 
   /**
