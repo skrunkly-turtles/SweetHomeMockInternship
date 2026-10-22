@@ -288,6 +288,7 @@ public class PlanComponent extends JComponent implements PlanView, Scrollable, P
   private JToolTip              toolTip;
   private JWindow               toolTipWindow;
   private boolean               resizeIndicatorVisible;
+  private boolean               printingLevels;
   
   private Map<PlanController.EditableProperty, JFormattedTextField> toolTipEditableTextFields;
   private KeyListener                       toolTipKeyListener;
@@ -2008,6 +2009,34 @@ public class PlanComponent extends JComponent implements PlanView, Scrollable, P
    * that makes it fill <code>pageFormat</code> imageable size if this attribute is <code>null</code>.
    */
   public int print(Graphics g, PageFormat pageFormat, int pageIndex) {
+    if (!this.printingLevels) {
+      List<Level> levels = new ArrayList<Level>();
+      for (Level level : this.home.getLevels()) {      // already in level order
+        if (level.isViewable()) {
+          levels.add(level);
+        }
+      }
+      if (!levels.isEmpty()) {
+        Level selectedLevel = this.home.getSelectedLevel();
+        this.printingLevels = true;
+        try {
+          int firstPageOfLevel = 0;
+          for (Level level : levels) {
+            this.home.setSelectedLevel(level);
+            int pageCount = getSelectedLevelPageCount(g, pageFormat);
+            if (pageIndex < firstPageOfLevel + pageCount) {
+              // Re-enters print with the guard set, so the original code below prints this level's page
+              return print(g, pageFormat, pageIndex - firstPageOfLevel);
+            }
+            firstPageOfLevel += pageCount;
+          }
+          return NO_SUCH_PAGE;
+        } finally {
+          this.printingLevels = false;
+          this.home.setSelectedLevel(selectedLevel);   // runs even if rendering throws
+        }
+      }
+    }
     List<Selectable> printedItems = getPaintedItems(); 
     Rectangle2D printedItemBounds = getItemsBounds(g, printedItems);
     if (printedItemBounds != null) {
@@ -2074,7 +2103,26 @@ public class PlanComponent extends JComponent implements PlanView, Scrollable, P
       return NO_SUCH_PAGE;
     }
   }
-  
+
+  private int getSelectedLevelPageCount(Graphics g, PageFormat pageFormat) {
+    Rectangle2D bounds = getItemsBounds(g, getPaintedItems());
+    if (bounds == null) {
+      return 0;
+    }
+    if (this.home.getPrint() == null || this.home.getPrint().getPlanScale() == null) {
+      return 1;
+    }
+    float printScale = this.home.getPrint().getPlanScale().floatValue() * LengthUnit.centimeterToInch(72);
+    int pagesPerRow = (int)(bounds.getWidth() * printScale / pageFormat.getImageableWidth());
+    if (bounds.getWidth() * printScale != pageFormat.getImageableWidth()) {
+      pagesPerRow++;
+    }
+    int pagesPerColumn = (int)(bounds.getHeight() * printScale / pageFormat.getImageableHeight());
+    if (bounds.getHeight() * printScale != pageFormat.getImageableHeight()) {
+      pagesPerColumn++;
+    }
+    return pagesPerRow * pagesPerColumn;
+  }
   /**
    * Returns an image of the selected items displayed by this component 
    * (camera excepted) with no outline at scale 1/1 (1 pixel = 1cm).

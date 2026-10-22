@@ -750,36 +750,59 @@ public class FurnitureTable extends JTable implements View, Printable {
           return headerRendererLabel;
         }
       };
-    for (int columnIndex = 0, n = columnModel.getColumnCount(); columnIndex < n; columnIndex++) {
-      final TableColumn tableColumn = columnModel.getColumn(columnIndex);
+    // Collect the columns to print, adding a Level column after Name when it isn't displayed
+    List<TableColumn> printedColumns = new ArrayList<TableColumn>();
+    boolean levelColumnDisplayed = false;
+    for (int i = 0, n = columnModel.getColumnCount(); i < n; i++) {
+      if (columnModel.getColumn(i).getIdentifier() == HomePieceOfFurniture.SortableProperty.LEVEL) {
+        levelColumnDisplayed = true;
+      }
+    }
+    for (int i = 0, n = columnModel.getColumnCount(); i < n; i++) {
+      printedColumns.add(columnModel.getColumn(i));
+    }
+    if (!levelColumnDisplayed) {
+      printedColumns.add(createLevelColumn());   // always last
+    }
+
+    for (final TableColumn tableColumn : printedColumns) {
       // Create a printable column from existing table column
       TableColumn printableColumn = new TableColumn();
       printableColumn.setIdentifier(tableColumn.getIdentifier());
       printableColumn.setHeaderValue(tableColumn.getHeaderValue());
       TableCellRenderer printableCellRenderer = new TableCellRenderer() {
-          public Component getTableCellRendererComponent(JTable table, Object value, 
-                                 boolean isSelected, boolean hasFocus, int row, int column) {
-            // Delegate rendering to existing cell renderer 
-            TableCellRenderer cellRenderer = tableColumn.getCellRenderer();
-            Component rendererComponent = cellRenderer.getTableCellRendererComponent(table, value, 
-                isSelected, hasFocus, row, column);
-            if (rendererComponent instanceof JCheckBox) {
-              // Prefer a x sign for boolean values instead of check boxes
-              rendererComponent = defaultRenderer.getTableCellRendererComponent(table, 
-                  ((JCheckBox)rendererComponent).isSelected() ? "x" : "", false, false, row, column);
-            }
-            rendererComponent.setBackground(Color.WHITE);
-            rendererComponent.setForeground(Color.BLACK);
-            return rendererComponent;
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
+          // Delegate rendering to existing cell renderer
+          TableCellRenderer cellRenderer = tableColumn.getCellRenderer();
+          Component rendererComponent = cellRenderer.getTableCellRendererComponent(table, value,
+                  isSelected, hasFocus, row, column);
+          if (rendererComponent instanceof JCheckBox) {
+            // Prefer a x sign for boolean values instead of check boxes
+            rendererComponent = defaultRenderer.getTableCellRendererComponent(table,
+                    ((JCheckBox)rendererComponent).isSelected() ? "x" : "", false, false, row, column);
           }
-        };
-      // Change printable column cell renderer 
+          rendererComponent.setBackground(Color.WHITE);
+          rendererComponent.setForeground(Color.BLACK);
+          return rendererComponent;
+        }
+      };
       printableColumn.setCellRenderer(printableCellRenderer);
-      // Change printable column header renderer
       printableColumn.setHeaderRenderer(printableHeaderRenderer);
       printableColumnModel.addColumn(printableColumn);
-    }    
+    }
     return print(g, pageFormat, pageIndex, printableColumnModel, Color.BLACK);
+  }
+  /**
+   * Returns a column displaying furniture level, used only to print the table.
+   */
+  private TableColumn createLevelColumn() {
+    FurnitureTableColumnModel model = (FurnitureTableColumnModel)getColumnModel();
+    TableColumn levelColumn = new TableColumn();
+    levelColumn.setIdentifier(HomePieceOfFurniture.SortableProperty.LEVEL);
+    levelColumn.setHeaderValue(model.getColumnName(HomePieceOfFurniture.SortableProperty.LEVEL, this.preferences));
+    levelColumn.setCellRenderer(model.getColumnRenderer(HomePieceOfFurniture.SortableProperty.LEVEL, this.preferences));
+    return levelColumn;
   }
 
   /**
@@ -2386,4 +2409,5 @@ public class FurnitureTable extends JTable implements View, Printable {
      */
     public abstract boolean include(Home home, HomePieceOfFurniture piece);
   }
+
 }
